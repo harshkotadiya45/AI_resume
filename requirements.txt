@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+nltk
+spacy
+fastapi
+uvicorn
+python-multipart
+jinja2
+pdfplumber
+PyYAML
