@@ -59,6 +59,12 @@ class DataTransformation:
             test_df['cleaned_resume'] = test_df['Resume_str'].apply(self.clean_text)
             logging.info("Text cleaning completed")
 
+            # Save cleaned data
+            os.makedirs("artifacts", exist_ok=True)
+            train_df.to_csv("artifacts/train_cleaned.csv", index=False)
+            test_df.to_csv("artifacts/test_cleaned.csv", index=False)
+            logging.info("Cleaned data saved")
+
             # Label Encoding - fit on full data to avoid unseen labels
             le = LabelEncoder()
             all_categories = pd.concat([train_df['Category'], test_df['Category']])
