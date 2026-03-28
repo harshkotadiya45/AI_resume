@@ -28,15 +28,19 @@ class DataTransformation:
         self.transformation_config = DataTransformationConfig()
 
     def clean_text(self, text):
-        # Handle empty/null values
+        import re
         if pd.isna(text) or not isinstance(text, str):
             return ""
         # Remove URLs
         text = re.sub(r'http\S+\s*', ' ', text)
+        # Remove HTML tags
+        text = re.sub(r'<.*?>', ' ', text)
         # Remove special characters
         text = re.sub(r'[^a-zA-Z\s]', ' ', text)
         # Convert to lowercase
         text = text.lower()
+        # Remove single characters
+        text = re.sub(r'\s+[a-zA-Z]\s+', ' ', text)
         # Remove extra spaces
         text = re.sub(r'\s+', ' ', text).strip()
         return text
@@ -50,13 +54,13 @@ class DataTransformation:
             logging.info("Train and test data loaded")
 
             # Drop null values
-            train_df = train_df.dropna(subset=['Resume_str', 'Category'])
-            test_df = test_df.dropna(subset=['Resume_str', 'Category'])
+            train_df = train_df.dropna(subset=['Resume', 'Category'])
+            test_df = test_df.dropna(subset=['Resume', 'Category'])
             logging.info("Null values dropped")
 
             # Clean text
-            train_df['cleaned_resume'] = train_df['Resume_str'].apply(self.clean_text)
-            test_df['cleaned_resume'] = test_df['Resume_str'].apply(self.clean_text)
+            train_df['cleaned_resume'] = train_df['Resume'].apply(self.clean_text)
+            test_df['cleaned_resume'] = test_df['Resume'].apply(self.clean_text)
             logging.info("Text cleaning completed")
 
             # Save cleaned data
@@ -74,9 +78,14 @@ class DataTransformation:
 
             # TF-IDF Vectorization
             tfidf = TfidfVectorizer(
-                max_features=1500,
+                max_features=10000,
                 stop_words='english',
-                ngram_range=(1, 2)
+                ngram_range=(1, 3),
+                sublinear_tf=True,
+                min_df=2,
+                max_df=0.95,
+                analyzer='word',
+                token_pattern=r'\w{3,}'
             )
 
             X_train = tfidf.fit_transform(train_df['cleaned_resume'])
