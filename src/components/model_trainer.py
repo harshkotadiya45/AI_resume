@@ -36,7 +36,6 @@ class ModelTrainer:
                     "params": {
                         "C": [0.1, 1, 10, 100],
                         "solver": ["saga", "lbfgs"],
-                        "multi_class": ["multinomial"],
                         "penalty": ["l2"],
                         "tol": [1e-4, 1e-3]
                     }
@@ -56,7 +55,7 @@ class ModelTrainer:
                 },
                 "LinearSVC": {
                     "model": CalibratedClassifierCV(
-                        LinearSVC(random_state=42, max_iter=2000)
+                        LinearSVC(random_state=42, max_iter=10000)
                     ),
                     "params": {
                         "estimator__C": [0.01, 0.1, 1, 10, 100],
